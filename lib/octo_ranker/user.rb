@@ -1,9 +1,10 @@
 module OctoRanker
   class User
     attr_reader :score
+    attr_writer :login
 
-    def initialize(score = 0)
-      @score = score
+    def initialize(login = nil)
+      @login, @score = login, 0
     end
 
     def add_repo(commits, stars)
