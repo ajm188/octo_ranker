@@ -1,5 +1,6 @@
 require 'octo_ranker/version'
 require 'octo_ranker/user'
+require 'octo_ranker/repository'
 
 require 'octokit'
 
@@ -18,10 +19,11 @@ module OctoRanker
       users = Hash.new { |h, k| h[k] = OctoRanker::User.new }
       Octokit.organization_repositories(organization).each do |repo|
         stars = Octokit.stargazers(repo.full_name).size
+        ranker_repo = OctoRanker::Repository.new(stars)
         Octokit.contributor_stats(repo.full_name).each do |contributor_stat|
           user = users[contributor_stat.author.id]
           user.login = contributor_stat.author.login
-          user.add_repo(contributor_stat.total, stars)
+          user.add_repo(contributor_stat.total, ranker_repo)
         end
       end
       users.values.sort_by { |u| -u.score }
